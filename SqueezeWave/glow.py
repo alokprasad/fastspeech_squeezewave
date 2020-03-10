@@ -103,9 +103,8 @@ class Invertible1x1Conv(torch.nn.Module):
                 # Reverse computation
                 W_inverse = W.float().inverse()
                 W_inverse = Variable(W_inverse[..., None])
-                if z.type() == 'torch.cuda.HalfTensor':
-                    W_inverse = W_inverse.half()
-                self.W_inverse = W_inverse
+                self.W_inverse = W_inverse.half()
+            self.W_inverse = self.W_inverse.to(torch.float32)
             z = F.conv1d(z, self.W_inverse, bias=None, stride=1, padding=0)
             return z
         else:
@@ -148,8 +147,8 @@ class WN(torch.nn.Module):
             # depthwise separable convolution
             depthwise = torch.nn.Conv1d(n_channels, n_channels, 3,
                 dilation=dilation, padding=padding,
-                groups=n_channels).cuda()
-            pointwise = torch.nn.Conv1d(n_channels, 2*n_channels, 1).cuda()
+                groups=n_channels)
+            pointwise = torch.nn.Conv1d(n_channels, 2*n_channels, 1)
             bn = torch.nn.BatchNorm1d(n_channels) 
             self.in_layers.append(torch.nn.Sequential(bn, depthwise, pointwise))
             # res_skip_layer
@@ -245,12 +244,14 @@ class SqueezeWave(torch.nn.Module):
     def infer(self, spect, sigma=1.0):
         spect_size = spect.size()
         l = spect.size(2)*(256 // self.n_audio_channel)
-        if spect.type() == 'torch.cuda.HalfTensor':
-            audio = torch.cuda.HalfTensor(spect.size(0),
+
+        spect = spect.to(torch.float32)
+        if spect.type() == 'torch.HalfTensor':
+            audio = torch.HalfTensor(spect.size(0),
                                           self.n_remaining_channels,
                                           l).normal_()
         else:
-            audio = torch.cuda.FloatTensor(spect.size(0),
+            audio = torch.FloatTensor(spect.size(0),
                                            self.n_remaining_channels,
                                            l).normal_()
 
@@ -268,10 +269,10 @@ class SqueezeWave(torch.nn.Module):
             audio = self.convinv[k](audio, reverse=True)
 
             if k % self.n_early_every == 0 and k > 0:
-                if spect.type() == 'torch.cuda.HalfTensor':
-                    z = torch.cuda.HalfTensor(spect.size(0), self.n_early_size, l).normal_()
+                if spect.type() == 'torch.HalfTensor':
+                    z = torch.HalfTensor(spect.size(0), self.n_early_size, l).normal_()
                 else:
-                    z = torch.cuda.FloatTensor(spect.size(0), self.n_early_size, l).normal_()
+                    z = torch.FloatTensor(spect.size(0), self.n_early_size, l).normal_()
                 audio = torch.cat((sigma*z, audio),1)
 
         audio = audio.permute(0,2,1).contiguous().view(audio.size(0), -1).data
