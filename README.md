@@ -1,5 +1,8 @@
 # fastspeech_squeezewave
-Integration of Fastspeech Text to Mel generation and fast Vocoder Squeezewave ( CPU only)
+Integration of Fastspeech Text to Mel generation and fast Vocoder Squeezewave ( CPU only).
+This is one of the fastest TTS solution.
+
+@@ Can someone try on RPI (3 or 4 ) and update me timing information
 
 Code from 
 
