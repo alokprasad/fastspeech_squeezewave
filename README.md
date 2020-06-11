@@ -2,7 +2,6 @@
 Integration of Fastspeech Text to Mel generation and fast Vocoder Squeezewave ( CPU only).
 This is one of the fastest TTS solution.
 
-@@ Can someone try on RPI (3 or 4 ) and update me timing information
 
 Code from 
 
@@ -38,6 +37,7 @@ Text -->" Printing, in the only sense with which we are at present concerned, di
 
 Audio Duratio generated 11.5 Sec in arodun 3.83 seconds
 
+On X86 3.6ghz Single Core
 ```
 07:40:00alok@/mount/data/fastspeech_squeezewave/FastSpeech$ bash run_inference.sh 
 MEL Calculation:
@@ -50,3 +50,15 @@ Squeezewave vocoder time
 ```
 
 
+@@ On RasperryPi ( @varungujjar)
+```
+Raspberry Pi4 4GB
+Model : L128_small_pretrain
+Fastspeech :
+MEL Calculation:
+2.8617560863494873
+
+SqueezeWave
+Squeezewave vocoder time
+14.423999309539795
+```
